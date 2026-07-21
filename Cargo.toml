@@ -1,14 +1,15 @@
 [package]
 name = "multi-readers"
-version = "0.6.0"
+version = "0.7.0"
 edition = "2021"
 license = "MIT"
-description = "Combining multiple readers"
+description = "Expose multiple readers as one continuous reader"
 keywords = ["readers", "multiple", "async", "seek"]
 repository = "https://github.com/cradiy/multi-readers.git"
-[dependencies]
 
-tokio = { version = "1.44", optional = true }
+[dependencies]
+tokio = { version = "1.5", optional = true }
 
 [features]
-async = ["dep:tokio"]
+default = []
+tokio = ["dep:tokio"]

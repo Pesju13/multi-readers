@@ -1,20 +1,21 @@
 use std::io::{Cursor, Read};
 
-use multi_readers::wrap;
+use multi_readers::MultiReader;
 
 fn main() -> std::io::Result<()> {
-    // Same type
-    let r1 = Cursor::new("Hello, ");
-    let r2 = Cursor::new("World!");
-    let mut readers = wrap!(r1.clone(), r2.clone());
+    let mut readers = MultiReader::new([Cursor::new("Hello, "), Cursor::new("World!")]);
     let mut hello_world = String::new();
     readers.read_to_string(&mut hello_world)?;
     assert_eq!(hello_world.as_str(), "Hello, World!");
-    // Different types
-    let r3 = Cursor::new(b" Rust!");
-    let mut readers = wrap!(dyn std::io::Read, r1, r2, r3);
+
+    let readers: Vec<Box<dyn Read>> = vec![
+        Box::new(Cursor::new("Hello, ")),
+        Box::new(&b"World"[..]),
+        Box::new(Cursor::new(b"!")),
+    ];
+    let mut readers = MultiReader::new(readers);
     let mut buf = String::new();
     readers.read_to_string(&mut buf)?;
-    assert_eq!(buf.as_str(), "Hello, World! Rust!");
+    assert_eq!(buf.as_str(), "Hello, World!");
     Ok(())
 }
